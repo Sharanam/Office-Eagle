@@ -3,9 +3,9 @@ using Office_Eagle.Models;
 
 namespace Office_Eagle.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class OfficeEagleDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public OfficeEagleDbContext(DbContextOptions<OfficeEagleDbContext> options)
             : base(options) { }
 
         public DbSet<User> Users { get; set; }

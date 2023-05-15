@@ -11,7 +11,7 @@ using Office_Eagle.Data;
 
 namespace Office_Eagle.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(OfficeEagleDbContext))]
     [Migration("20230515073045_init1")]
     partial class init1
     {

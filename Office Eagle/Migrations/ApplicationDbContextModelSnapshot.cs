@@ -10,7 +10,7 @@ using Office_Eagle.Data;
 
 namespace Office_Eagle.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(OfficeEagleDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
