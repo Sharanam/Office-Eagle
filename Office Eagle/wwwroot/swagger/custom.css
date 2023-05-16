@@ -1,0 +1,54 @@
+﻿:root {
+  --swagger-ui-font-size: 1.2rem;
+  --swagger-ui-color: #6b23ae;
+  --swagger-ui-background: #373737;
+  --swagger-ui-color-text: #ffffff;
+  --swagger-ui-color-text-contrast: #ffffff;
+  --swagger-ui-color-text-contrast-hover: #ffffff;
+  --swagger-ui-color-border: #000000;
+  --swagger-ui-color-border-hover: #000000;
+  --swagger-ui-color-border-focus: #000000;
+  --swagger-ui-color-border-error: #ef1c25;
+  --swagger-ui-color-background: #000000;
+  --swagger-ui-color-background-hover: #ffffff;
+  --swagger-ui-color-background-hover-focus: #ffffff;
+  --swagger-ui-color-background-disabled: #ffffff;
+  --swagger-ui-color-highlight-code: #ffffff;
+  --swagger-ui-color-scrollbar: #ffffff;
+  --swagger-ui-opacity-disabled: 0.4;
+  --swagger-ui-font-family: "Arial", sans-serif;
+  --swagger-ui-font-family-monospace: "Arial", sans-serif;
+  --swagger-ui-font-weight: 400;
+  --swagger-ui-font-weight-bold: 700;
+  --swagger-ui-font-size-small: 0.8rem;
+}
+.swagger-ui .topbar {
+  background-color: var(--swagger-ui-color);
+  border-bottom: 3px solid var(--swagger-ui-color-border);
+}
+/*.swagger-ui {
+  font-size: var(--swagger-ui-font-size);
+  font-family: var(--swagger-ui-font-family);
+  font-weight: var(--swagger-ui-font-weight);
+  color: var(--swagger-ui-color-text);
+  background-color: var(--swagger-ui-color-background);
+}
+
+.swagger-ui .topbar .download-url-wrapper .select-label select {
+  border-color: var(--swagger-ui-color-border);
+}
+
+.swagger-ui .info .title small:last-child {
+  background-color: var(--swagger-ui-color);
+}
+
+.swagger-ui .topbar .download-url-wrapper .download-url-button {
+  background-color: var(--swagger-ui-color);
+  border-color: var(--swagger-ui-color-border);
+}
+
+.swagger-ui .topbar .download-url-wrapper .download-url-button:hover {
+  background-color: var(--swagger-ui-color-border);
+  border-color: var(--swagger-ui-color-border);
+}
+*/
