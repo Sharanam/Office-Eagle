@@ -5,8 +5,8 @@ namespace Office_Eagle.Repositories
 {
     public interface IAuthRepository
     {
-        Task<ReadEmployeeDTO> Login(string username, string password);
-        Task<User> Register(User user, string password);
+        Task<User> Login(string username, string password);
+        Task<User> Register(RegisterUserDTO user);
         Task<bool> UserExists(string username);
         Task<ReadEmployeeDTO> GetUser(string username);
         Task<ReadEmployeeDTO> GetUserById(Guid id);
@@ -20,7 +20,6 @@ namespace Office_Eagle.Repositories
         Task<List<ReadEmployeeDTO>> GetAllAdmins();
         Task<List<ReadEmployeeDTO>> GetAllEmployeesUnderManager(Guid managerId);
 
-        string GenerateJwtToken(ReadEmployeeDTO user);
-
+        string GenerateJwtToken(User user);
     }
 }

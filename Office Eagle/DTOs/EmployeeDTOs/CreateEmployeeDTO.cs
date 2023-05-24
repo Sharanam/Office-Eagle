@@ -19,11 +19,17 @@ namespace Office_Eagle.DTOs
         public string EmployeeID { get; set; } = "";
 
         public string Designation { get; set; } = "";
+
         public string Department { get; set; } = "";
+
         public Guid ManagerId { get; set; }
+
         public decimal LeaveBalance { get; set; } = 0;
+
         public Gender Gender { get; set; }
+
         public Role Role { get; set; }
+
         public DateTime CreatedAt { get; set; }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Office_Eagle.Data;
 using Office_Eagle.DTOs;
 using Office_Eagle.Models;
-using System.Collections;
+using Office_Eagle.Services;
 
 namespace Office_Eagle.Repositories
 {
@@ -19,9 +19,26 @@ namespace Office_Eagle.Repositories
             _mapper = mapper;
         }
 
+        private bool EmployeeExists(Guid id, string username = "", string employeeID = "")
+        {
+            return _dbContext.Users.Any(
+                e => e.Id == id || e.Username == username || e.EmployeeID == employeeID
+            );
+        }
+
         async Task<CreateEmployeeDTO> IEmployeeRepository.AddEmployee(CreateEmployeeDTO employee)
         {
             User user = _mapper.Map<User>(employee);
+            if (EmployeeExists(user.Id, user.Username, user.EmployeeID))
+            {
+                throw new Exception("Employee already exists");
+            }
+            if (!string.IsNullOrEmpty(employee.Password))
+            {
+                user.Password = PasswordGuardian.HashPassword(employee.Password);
+            }
+            user.CreatedAt = DateTime.Now;
+            user.UpdatedAt = DateTime.Now;
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
             employee = _mapper.Map<CreateEmployeeDTO>(user);
@@ -62,7 +79,6 @@ namespace Office_Eagle.Repositories
             ReadEmployeeDTO employeeDto = _mapper.Map<ReadEmployeeDTO>(user);
             return employeeDto;
         }
-
 
         async Task<UpdateEmployeeDTO> IEmployeeRepository.UpdateEmployee(UpdateEmployeeDTO employee)
         {

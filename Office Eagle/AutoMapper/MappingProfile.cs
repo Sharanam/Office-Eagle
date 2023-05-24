@@ -20,7 +20,8 @@ namespace Office_Eagle.AutoMapper
             CreateMap<User, UpdateUserDTO>();
             CreateMap<UpdateUserDTO, User>();
 
-           
+            CreateMap<User, RegisterUserDTO>();
+            CreateMap<RegisterUserDTO, User>();
         }
     }
 }

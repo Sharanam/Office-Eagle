@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using Office_Eagle.Data;
 using Office_Eagle.DTOs;
@@ -6,6 +7,7 @@ using Office_Eagle.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Office_Eagle.Services;
 
 namespace Office_Eagle.Repositories
 {
@@ -13,45 +15,81 @@ namespace Office_Eagle.Repositories
     {
         private readonly OfficeEagleDbContext _dbContext;
         private readonly IMapper _mapper;
-         private readonly IConfiguration _configuration;
-        private string GenerateJwtToken(User user)
+        private readonly IConfiguration _configuration;
+
+        string IAuthRepository.GenerateJwtToken(User user)
         {
+            var key = Encoding.ASCII.GetBytes(_configuration["Authentication:Key"]);
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["AppSettings:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["AppSettings:TokenExpirationDurationMinutes"])),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+                Subject = new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Role, user.Role.ToString())
+                    }
+                ),
+                Expires = DateTime.UtcNow.AddMinutes(
+                    int.Parse(
+                        _configuration["Authentication:TokenExpirationDurationMinutes"] ?? "60"
+                    )
+                ),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha512Signature
+                )
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        public DbAuthRepository(OfficeEagleDbContext dbContext, IMapper mapper, IConfiguration configuration)
+
+        public DbAuthRepository(
+            OfficeEagleDbContext dbContext,
+            IMapper mapper,
+            IConfiguration configuration
+        )
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _configuration = configuration;
         }
 
-        Task<ReadEmployeeDTO> IAuthRepository.Login(string username, string password)
+        async Task<User> IAuthRepository.Login(string username, string password)
         {
-            throw new NotImplementedException();
+            // User? user = _dbContext.Users.FirstOrDefault(x => x.Username == username);
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Username == username);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+            if (!PasswordGuardian.VerifyPassword(password, user.Password))
+            {
+                throw new Exception("Incorrect password");
+            }
+
+            return (user);
         }
 
-        Task<User> IAuthRepository.Register(User user, string password)
+        async Task<User> IAuthRepository.Register(RegisterUserDTO registeringUser)
         {
-            throw new NotImplementedException();
+            User user = _mapper.Map<User>(registeringUser);
+            if (await ((IAuthRepository)this).UserExists(user.Username))
+            {
+                throw new Exception("Username already exists");
+            }
+
+            user.Password = PasswordGuardian.HashPassword(user.Password);
+            user.CreatedAt = DateTime.Now;
+            await _dbContext.Users.AddAsync(user);
+            await _dbContext.SaveChangesAsync();
+            return user;
         }
 
-        Task<bool> IAuthRepository.UserExists(string username)
+        async Task<bool> IAuthRepository.UserExists(string username)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Users.AnyAsync(x => x.Username == username);
         }
 
         Task<ReadEmployeeDTO> IAuthRepository.GetUser(string username)
@@ -100,11 +138,6 @@ namespace Office_Eagle.Repositories
         }
 
         Task<List<ReadEmployeeDTO>> IAuthRepository.GetAllEmployeesUnderManager(Guid managerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        string IAuthRepository.GenerateJwtToken(ReadEmployeeDTO user)
         {
             throw new NotImplementedException();
         }

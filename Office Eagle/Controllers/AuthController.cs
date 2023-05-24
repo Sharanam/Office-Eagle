@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Office_Eagle.Repositories;
 using Office_Eagle.DTOs;
+using Microsoft.AspNetCore.Authorization;
+
 namespace Office_Eagle.Controllers
 {
     [Route("api/[controller]")]
@@ -19,29 +21,42 @@ namespace Office_Eagle.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
-            var user = await _authRepository.Login(loginDTO.Username, loginDTO.Password);
-            if (user == null)
+            try
             {
-                return Unauthorized();
+                var user = await _authRepository.Login(loginDTO.Username, loginDTO.Password);
+                Console.WriteLine("User: " + user);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+                return Ok(new { token = _authRepository.GenerateJwtToken(user) });
             }
-            return Ok(new
+            catch (Exception e)
             {
-                token = _authRepository.GenerateJwtToken(user)
-            });
+                Console.WriteLine(e);
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterUserDTO registerDTO)
         {
-            if (await _authRepository.UserExists(registerDTO.Username))
+            try
             {
-                return BadRequest("Username already exists");
+                if (await _authRepository.UserExists(registerDTO.Username))
+                {
+                    return BadRequest("Username already exists");
+                }
+                return Ok(await _authRepository.Register(registerDTO));
             }
-            //var user = await _authRepository.Register(registerDTO);
-            return StatusCode(201);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpGet("user-exists/{username}")]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> UserExists(string username)
         {
             return Ok(await _authRepository.UserExists(username));
@@ -66,7 +81,9 @@ namespace Office_Eagle.Controllers
         }
 
         [HttpPut("update-password")]
-        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDTO)
+        public async Task<IActionResult> UpdatePassword(
+            [FromBody] UpdatePasswordDTO updatePasswordDTO
+        )
         {
             return Ok(await _authRepository.UpdatePassword(updatePasswordDTO));
         }
@@ -106,6 +123,5 @@ namespace Office_Eagle.Controllers
         {
             return Ok(await _authRepository.GetAllEmployeesUnderManager(managerId));
         }
-
     }
 }

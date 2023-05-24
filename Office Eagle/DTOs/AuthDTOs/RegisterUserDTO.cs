@@ -1,28 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Office_Eagle.Models;
 
-namespace Office_Eagle.Models
+namespace Office_Eagle.DTOs
 {
-    public enum Gender
+    public class RegisterUserDTO
     {
-        Male,
-        Female,
-        Other
-    }
-
-    public enum Role
-    {
-        Employee,
-        Manager,
-        Admin
-    }
-
-    public class User
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
-
         [Required]
         [StringLength(32, MinimumLength = 4)]
         [RegularExpression(
@@ -51,6 +34,7 @@ namespace Office_Eagle.Models
         [Phone]
         [Required]
         [StringLength(13, MinimumLength = 7)]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Contact number can only contain numbers")]
         public string ContactNumber { get; set; } = "";
 
         [Required]
@@ -79,24 +63,5 @@ namespace Office_Eagle.Models
 
         [Required]
         public Gender Gender { get; set; }
-
-        [Required]
-        public Role Role { get; set; }
-
-        public bool GotUpdate { get; set; }
-
-        [Required]
-        public DateTime CreatedAt { get; set; }
-
-        [Required]
-        public DateTime UpdatedAt { get; set; }
-
-        public User()
-        {
-            Id = Guid.NewGuid();
-            GotUpdate = false;
-            CreatedAt = DateTime.Now;
-            UpdatedAt = DateTime.Now;
-        }
     }
 }

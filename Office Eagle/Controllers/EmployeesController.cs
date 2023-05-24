@@ -43,11 +43,12 @@ namespace Office_Eagle.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] CreateEmployeeDTO employee)
+        public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeDTO employee)
         {
             try
             {
                 employee.Password = PasswordGuardian.HashPassword(employee.Password);
+                employee.CreatedAt = DateTime.Now;
                 return Ok(await _employeeRepository.AddEmployee(employee));
             }
             catch (System.Exception e)
